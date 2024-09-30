@@ -191,14 +191,6 @@ app.post('/payment-success', async (req, res) => {
                   `Best regards,\nVolleyball League`
         };
 
-        // Send both emails
-        transporter.sendMail(parentMailOptions, (error, info) => {
-            if (error) {
-                console.error('Error sending email to parent:', error);
-            } else {
-                console.log('Email sent to parent:', info.response);
-            }
-        });
 
         transporter.sendMail(adminMailOptions, (error, info) => {
             if (error) {
