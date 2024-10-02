@@ -51,10 +51,17 @@ const RegistrationSchema = new mongoose.Schema({
   parentEmail: String,
   parentPhone: String,
   permission: Boolean,
+  address: String,
+  country: String,
+  state: String,
+  city: String,
+  pinCode: String,
+  category: String,
   paymentStatus: { type: String, default: "Pending" },
   razorpayOrderId: String,
   amount: Number,
 });
+
 
 const Registration = mongoose.model("Registration", RegistrationSchema);
 
@@ -80,6 +87,12 @@ app.post("/register", async (req, res) => {
       parentEmail,
       parentPhone,
       permission,
+      address,
+      country,
+      state,
+      city,
+      pinCode,
+      category,
     } = req.body;
 
     // Validate required fields
@@ -91,7 +104,13 @@ app.post("/register", async (req, res) => {
       !parentFirstName ||
       !parentLastName ||
       !parentEmail ||
-      !parentPhone
+      !parentPhone ||
+      !address ||
+      !country ||
+      !state ||
+      !city ||
+      !pinCode ||
+      !category
     ) {
       return res
         .status(400)
@@ -128,6 +147,12 @@ app.post("/register", async (req, res) => {
       parentEmail,
       parentPhone,
       permission,
+      address,
+      country,
+      state,
+      city,
+      pinCode,
+      category,
       razorpayOrderId: order.id,
       amount: amount / 100, // Converting to rupees
     });
@@ -141,6 +166,7 @@ app.post("/register", async (req, res) => {
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
+
 
 app.post('/payment-success', async (req, res) => {
     try {
@@ -171,25 +197,32 @@ app.post('/payment-success', async (req, res) => {
 
         // Send email to the admin with full registration details
         const adminMailOptions = {
-            from: 'uppvlofficial@gmail.com',
-            to: 'uppvlofficial@gmail.com',
-            subject: 'New Registration - Volleyball League',
-            text: `New registration details:\n\n` +
-                  `Player Name: ${registration.playerFirstName} ${registration.playerLastName}\n` +
-                  `Date of Birth: ${registration.dob}\n` +
-                  `Grade: ${registration.playerGrade}\n` +
-                  `Previous Seasons Played: ${registration.previousSeasons}\n` +
-                  `Positions Played: ${registration.positionsPlayed.join(', ')}\n` +
-                  `Positions Trying Out: ${registration.positionsTryingOut.join(', ')}\n` +
-                  `Parent Name: ${registration.parentFirstName} ${registration.parentLastName}\n` +
-                  `Email: ${registration.parentEmail}\n` +
-                  `Phone: ${registration.parentPhone}\n` +
-                  `Permission: ${registration.permission ? 'Granted' : 'Not Granted'}\n` +
-                  `Payment Status: ${registration.paymentStatus}\n` +
-                  `Order ID: ${registration.razorpayOrderId}\n` +
-                  `Amount: ₹${registration.amount}\n\n` +
-                  `Best regards,\nVolleyball League`
+          from: 'uppvlofficial@gmail.com',
+          to: 'uppvlofficial@gmail.com',
+          subject: 'New Registration - Volleyball League',
+          text: `New registration details:\n\n` +
+                `Player Name: ${registration.playerFirstName} ${registration.playerLastName}\n` +
+                `Date of Birth: ${registration.dob}\n` +
+                `Grade: ${registration.playerGrade}\n` +
+                `Previous Seasons Played: ${registration.previousSeasons}\n` +
+                `Positions Played: ${registration.positionsPlayed.join(', ')}\n` +
+                `Positions Trying Out: ${registration.positionsTryingOut.join(', ')}\n` +
+                `Address: ${registration.address}\n` +
+                `Country: ${registration.country}\n` +
+                `State: ${registration.state}\n` +
+                `City: ${registration.city}\n` +
+                `Pin Code: ${registration.pinCode}\n` +
+                `Category: ${registration.category}\n` +
+                `Parent Name: ${registration.parentFirstName} ${registration.parentLastName}\n` +
+                `Email: ${registration.parentEmail}\n` +
+                `Phone: ${registration.parentPhone}\n` +
+                `Permission: ${registration.permission ? 'Granted' : 'Not Granted'}\n` +
+                `Payment Status: ${registration.paymentStatus}\n` +
+                `Order ID: ${registration.razorpayOrderId}\n` +
+                `Amount: ₹${registration.amount}\n\n` +
+                `Best regards,\nVolleyball League`
         };
+        
 
 
         transporter.sendMail(adminMailOptions, (error, info) => {
