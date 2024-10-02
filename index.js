@@ -10,23 +10,23 @@ const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
   service: "Gmail", // or your email service provider
   auth: {
-    user: 'uppvlofficial@gmail.com', // your email
-    pass: 'udmghpdmgbeeukka', // your email password or app-specific password
+    user: "uppvlofficial@gmail.com", // your email
+    pass: "udmghpdmgbeeukka", // your email password or app-specific password
   },
 });
 
-const AUTH_KEY = 'uppkvl'; // Define your key
+const AUTH_KEY = "uppkvl"; // Define your key
 
 const authenticateKey = (req, res, next) => {
-    const authKey = req.headers['authorization'];
+  const authKey = req.headers["authorization"];
 
-    if (authKey !== AUTH_KEY) {
-        return res.status(403).json({ success: false, message: 'Forbidden: Invalid API key' });
-    }
-    next();
+  if (authKey !== AUTH_KEY) {
+    return res
+      .status(403)
+      .json({ success: false, message: "Forbidden: Invalid API key" });
+  }
+  next();
 };
-
-
 
 require("dotenv").config();
 
@@ -51,30 +51,32 @@ mongoose
   .catch((err) => console.error("Could not connect to MongoDB...", err));
 
 // Create Mongoose schema and model
-const RegistrationSchema = new mongoose.Schema({
-  playerFirstName: String,
-  playerLastName: String,
-  dob: Date,
-  phone: String,
-  previousSeasons: Number,
-  positionsPlayed: [String],
-  positionsTryingOut: [String],
-  parentFirstName: String,
-  parentLastName: String,
-  parentEmail: String,
-  parentPhone: String,
-  permission: Boolean,
-  address: String,
-  country: String,
-  state: String,
-  city: String,
-  pinCode: String,
-  category: String,
-  paymentStatus: { type: String, default: "Pending" },
-  razorpayOrderId: String,
-  amount: Number,
-});
-
+const RegistrationSchema = new mongoose.Schema(
+  {
+    playerFirstName: String,
+    playerLastName: String,
+    dob: Date,
+    phone: String,
+    previousSeasons: Number,
+    positionsPlayed: [String],
+    positionsTryingOut: [String],
+    parentFirstName: String,
+    parentLastName: String,
+    parentEmail: String,
+    parentPhone: String,
+    permission: Boolean,
+    address: String,
+    country: String,
+    state: String,
+    city: String,
+    pinCode: String,
+    category: String,
+    paymentStatus: { type: String, default: "Pending" },
+    razorpayOrderId: String,
+    amount: Number,
+  },
+  { timestamps: true }
+);
 
 const Registration = mongoose.model("Registration", RegistrationSchema);
 
@@ -180,87 +182,100 @@ app.post("/register", async (req, res) => {
   }
 });
 
-
-app.post('/payment-success', async (req, res) => {
-    try {
-        const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
-
-        // Verify signature
-        const generatedSignature = crypto.createHmac('sha256', 'C0j0RO9lb1MtmnC2g7OVvPHT')
-            .update(`${razorpay_order_id}|${razorpay_payment_id}`)
-            .digest('hex');
-
-        if (generatedSignature !== razorpay_signature) {
-            return res.status(400).json({ success: false, message: 'Invalid signature' });
-        }
-
-        // Update payment status in MongoDB
-        const registration = await Registration.findOneAndUpdate(
-            { razorpayOrderId: razorpay_order_id },
-            { paymentStatus: 'Completed' },
-            { new: true }
-        );
-
-        if (!registration) {
-            return res.status(404).json({ success: false, message: 'Order not found' });
-        }
-
-        // Send confirmation email to the parent
-        
-
-        // Send email to the admin with full registration details
-        const adminMailOptions = {
-          from: 'uppvlofficial@gmail.com',
-          to: 'uppvlofficial@gmail.com',
-          subject: 'New Registration - Volleyball League',
-          text: `New registration details:\n\n` +
-                `Player Name: ${registration.playerFirstName} ${registration.playerLastName}\n` +
-                `Date of Birth: ${registration.dob}\n` +
-                `Phone: ${registration.phone}\n` +
-                `Previous Seasons Played: ${registration.previousSeasons}\n` +
-                `Positions Played: ${registration.positionsPlayed.join(', ')}\n` +
-                `Positions Trying Out: ${registration.positionsTryingOut.join(', ')}\n` +
-                `Address: ${registration.address}\n` +
-                `Country: ${registration.country}\n` +
-                `State: ${registration.state}\n` +
-                `City: ${registration.city}\n` +
-                `Pin Code: ${registration.pinCode}\n` +
-                `Category: ${registration.category}\n` +
-                `Parent Name: ${registration.parentFirstName} ${registration.parentLastName}\n` +
-                `Email: ${registration.parentEmail}\n` +
-                `Phone: ${registration.parentPhone}\n` +
-                `Permission: ${registration.permission ? 'Granted' : 'Not Granted'}\n` +
-                `Payment Status: ${registration.paymentStatus}\n` +
-                `Order ID: ${registration.razorpayOrderId}\n` +
-                `Amount: ₹${registration.amount}\n\n` +
-                `Best regards,\nVolleyball League`
-        };
-        
-
-
-        transporter.sendMail(adminMailOptions, (error, info) => {
-            if (error) {
-                console.error('Error sending email to admin:', error);
-            } else {
-                console.log('Email sent to admin:', info.response);
-            }
-        });
-
-        res.status(200).json({ success: true, message: 'Payment verified successfully', data: registration });
-    } catch (error) {
-        console.error('Error in payment success:', error);
-        res.status(500).json({ success: false, message: 'Internal Server Error' });
-    }
-});
-app.get('/get-registrations', authenticateKey, async (req, res) => {
+app.post("/payment-success", async (req, res) => {
   try {
-      const registrations = await Registration.find({paymentStatus:"Completed"}).sort({_id:-1});
-      res.status(200).json({ success: true, data: registrations });
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
+      req.body;
+
+    // Verify signature
+    const generatedSignature = crypto
+      .createHmac("sha256", "C0j0RO9lb1MtmnC2g7OVvPHT")
+      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .digest("hex");
+
+    if (generatedSignature !== razorpay_signature) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid signature" });
+    }
+
+    // Update payment status in MongoDB
+    const registration = await Registration.findOneAndUpdate(
+      { razorpayOrderId: razorpay_order_id },
+      { paymentStatus: "Completed" },
+      { new: true }
+    );
+
+    if (!registration) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Order not found" });
+    }
+
+    // Send confirmation email to the parent
+
+    // Send email to the admin with full registration details
+    const adminMailOptions = {
+      from: "uppvlofficial@gmail.com",
+      to: "uppvlofficial@gmail.com",
+      subject: "New Registration - Volleyball League",
+      text:
+        `New registration details:\n\n` +
+        `Player Name: ${registration.playerFirstName} ${registration.playerLastName}\n` +
+        `Date of Birth: ${registration.dob}\n` +
+        `Phone: ${registration.phone}\n` +
+        `Previous Seasons Played: ${registration.previousSeasons}\n` +
+        `Positions Played: ${registration.positionsPlayed.join(", ")}\n` +
+        `Positions Trying Out: ${registration.positionsTryingOut.join(
+          ", "
+        )}\n` +
+        `Address: ${registration.address}\n` +
+        `Country: ${registration.country}\n` +
+        `State: ${registration.state}\n` +
+        `City: ${registration.city}\n` +
+        `Pin Code: ${registration.pinCode}\n` +
+        `Category: ${registration.category}\n` +
+        `Parent Name: ${registration.parentFirstName} ${registration.parentLastName}\n` +
+        `Email: ${registration.parentEmail}\n` +
+        `Phone: ${registration.parentPhone}\n` +
+        `Permission: ${registration.permission ? "Granted" : "Not Granted"}\n` +
+        `Payment Status: ${registration.paymentStatus}\n` +
+        `Order ID: ${registration.razorpayOrderId}\n` +
+        `Amount: ₹${registration.amount}\n\n` +
+        `Best regards,\nVolleyball League`,
+    };
+
+    transporter.sendMail(adminMailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email to admin:", error);
+      } else {
+        console.log("Email sent to admin:", info.response);
+      }
+    });
+
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "Payment verified successfully",
+        data: registration,
+      });
   } catch (error) {
-      console.error('Error fetching registrations:', error);
-      res.status(500).json({ success: false, message: 'Internal Server Error' });
+    console.error("Error in payment success:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+app.get("/get-registrations", authenticateKey, async (req, res) => {
+  try {
+    const registrations = await Registration.find({
+      paymentStatus: "Completed",
+    }).sort({ _id: -1 });
+    res.status(200).json({ success: true, data: registrations });
+  } catch (error) {
+    console.error("Error fetching registrations:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
 // Start the server
-const port =  3000;
+const port = 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
