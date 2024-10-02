@@ -43,7 +43,6 @@ const RegistrationSchema = new mongoose.Schema({
   playerLastName: String,
   dob: Date,
   phone: String,
-  playerGrade: String,
   previousSeasons: Number,
   positionsPlayed: [String],
   positionsTryingOut: [String],
@@ -80,7 +79,6 @@ app.post("/register", async (req, res) => {
       playerLastName,
       dob,
       phone,
-      playerGrade,
       previousSeasons,
       positionsPlayed,
       positionsTryingOut,
@@ -103,7 +101,6 @@ app.post("/register", async (req, res) => {
       !playerLastName ||
       !dob ||
       !phone ||
-      !playerGrade ||
       !parentFirstName ||
       !parentLastName ||
       !parentEmail ||
@@ -142,7 +139,6 @@ app.post("/register", async (req, res) => {
       playerLastName,
       dob,
       phone,
-      playerGrade,
       previousSeasons,
       positionsPlayed,
       positionsTryingOut,
@@ -208,7 +204,6 @@ app.post('/payment-success', async (req, res) => {
                 `Player Name: ${registration.playerFirstName} ${registration.playerLastName}\n` +
                 `Date of Birth: ${registration.dob}\n` +
                 `Phone: ${registration.phone}\n` +
-                `Grade: ${registration.playerGrade}\n` +
                 `Previous Seasons Played: ${registration.previousSeasons}\n` +
                 `Positions Played: ${registration.positionsPlayed.join(', ')}\n` +
                 `Positions Trying Out: ${registration.positionsTryingOut.join(', ')}\n` +
