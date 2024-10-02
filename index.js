@@ -173,7 +173,7 @@ app.post("/register", async (req, res) => {
     });
 
     await registration.save();
-   return res
+    return res
       .status(201)
       .json({ success: true, orderId: order.id, amount: amount / 100 });
   } catch (error) {
@@ -253,7 +253,36 @@ app.post("/payment-success", async (req, res) => {
       }
     });
 
-   return res.status(200).json({
+    const userMailOptions = {
+      from: "uppvlofficial@gmail.com",
+      to: registration.parentEmail,
+      subject: "Successful Registration - UPPVL",
+      text:
+        `Dear ${registration.playerFirstName} ${registration.playerLastName},\n\n` +
+        `Congratulations! Your registration for the Uttar Pradesh Pro Volleyball League (UPPVL) has been successfully completed.\n\n` +
+        `We are excited to have you on board and look forward to an amazing season ahead!\n\n` +
+        `Best regards,\n` +
+        `UPPVL Team\n` +
+        `Uttar Pradesh Pro Volleyball League`,
+    };
+
+    transporter.sendMail(adminMailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email to admin:", error);
+      } else {
+        console.log("Email sent to admin:", info.response);
+      }
+    });
+
+    transporter.sendMail(userMailOptions, (error, info) => {
+      if (error) {
+        console.error("Error sending email to admin:", error);
+      } else {
+        console.log("Email sent to admin:", info.response);
+      }
+    });
+
+    return res.status(200).json({
       success: true,
       message: "Payment verified successfully",
       data: registration,
@@ -282,8 +311,7 @@ app.post("/get-registration-by-id", async (req, res) => {
       _id: id,
       paymentStatus: "Completed",
     }).sort({ _id: -1 });
-   return res.status(200).json({ success: true, data: registrations });
-
+    return res.status(200).json({ success: true, data: registrations });
   } catch (error) {
     console.error("Error in payment success:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
