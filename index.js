@@ -253,13 +253,11 @@ app.post("/payment-success", async (req, res) => {
       }
     });
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Payment verified successfully",
-        data: registration,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Payment verified successfully",
+      data: registration,
+    });
   } catch (error) {
     console.error("Error in payment success:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -273,6 +271,26 @@ app.get("/get-registrations", authenticateKey, async (req, res) => {
     res.status(200).json({ success: true, data: registrations });
   } catch (error) {
     console.error("Error fetching registrations:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error" });
+  }
+});
+app.post("/get-registration-by-id", async (req, res) => {
+  try {
+    const { id } = req.body;
+
+    const registrations = await Registration.findOne({
+      _id: id,
+      paymentStatus: "Completed",
+    }).sort({ _id: -1 });
+    res.status(200).json({ success: true, data: registrations });
+
+    res.status(200).json({
+      success: true,
+      message: "Payment verified successfully",
+      data: registration,
+    });
+  } catch (error) {
+    console.error("Error in payment success:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
   }
 });
