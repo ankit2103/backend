@@ -42,6 +42,7 @@ const RegistrationSchema = new mongoose.Schema({
   playerFirstName: String,
   playerLastName: String,
   dob: Date,
+  phone: String,
   playerGrade: String,
   previousSeasons: Number,
   positionsPlayed: [String],
@@ -67,8 +68,8 @@ const Registration = mongoose.model("Registration", RegistrationSchema);
 
 // Initialize Razorpay
 const razorpayInstance = new Razorpay({
-  key_id: "rzp_test_j6TQmy7c9caKEg",
-  key_secret: "RRg0M5s9D7Oe8KK0Nf7gxSWD",
+  key_id: "rzp_live_DmKsAhi3o9Leq3",
+  key_secret: "C0j0RO9lb1MtmnC2g7OVvPHT",
 });
 
 // API endpoint to handle registration form submission
@@ -78,6 +79,7 @@ app.post("/register", async (req, res) => {
       playerFirstName,
       playerLastName,
       dob,
+      phone,
       playerGrade,
       previousSeasons,
       positionsPlayed,
@@ -100,6 +102,7 @@ app.post("/register", async (req, res) => {
       !playerFirstName ||
       !playerLastName ||
       !dob ||
+      !phone ||
       !playerGrade ||
       !parentFirstName ||
       !parentLastName ||
@@ -138,6 +141,7 @@ app.post("/register", async (req, res) => {
       playerFirstName,
       playerLastName,
       dob,
+      phone,
       playerGrade,
       previousSeasons,
       positionsPlayed,
@@ -173,7 +177,7 @@ app.post('/payment-success', async (req, res) => {
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
         // Verify signature
-        const generatedSignature = crypto.createHmac('sha256', 'RRg0M5s9D7Oe8KK0Nf7gxSWD')
+        const generatedSignature = crypto.createHmac('sha256', 'C0j0RO9lb1MtmnC2g7OVvPHT')
             .update(`${razorpay_order_id}|${razorpay_payment_id}`)
             .digest('hex');
 
@@ -203,6 +207,7 @@ app.post('/payment-success', async (req, res) => {
           text: `New registration details:\n\n` +
                 `Player Name: ${registration.playerFirstName} ${registration.playerLastName}\n` +
                 `Date of Birth: ${registration.dob}\n` +
+                `Phone: ${registration.phone}\n` +
                 `Grade: ${registration.playerGrade}\n` +
                 `Previous Seasons Played: ${registration.previousSeasons}\n` +
                 `Positions Played: ${registration.positionsPlayed.join(', ')}\n` +
