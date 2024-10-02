@@ -15,6 +15,19 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+const AUTH_KEY = 'uppkvl'; // Define your key
+
+const authenticateKey = (req, res, next) => {
+    const authKey = req.headers['authorization'];
+
+    if (authKey !== AUTH_KEY) {
+        return res.status(403).json({ success: false, message: 'Forbidden: Invalid API key' });
+    }
+    next();
+};
+
+
+
 require("dotenv").config();
 
 // Initialize express app
@@ -238,6 +251,15 @@ app.post('/payment-success', async (req, res) => {
         console.error('Error in payment success:', error);
         res.status(500).json({ success: false, message: 'Internal Server Error' });
     }
+});
+app.get('/get-registrations', authenticateKey, async (req, res) => {
+  try {
+      const registrations = await Registration.find({}).sort({_id:-1});
+      res.status(200).json({ success: true, data: registrations });
+  } catch (error) {
+      console.error('Error fetching registrations:', error);
+      res.status(500).json({ success: false, message: 'Internal Server Error' });
+  }
 });
 // Start the server
 const port =  3000;
