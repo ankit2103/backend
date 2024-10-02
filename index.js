@@ -282,13 +282,8 @@ app.post("/get-registration-by-id", async (req, res) => {
       _id: id,
       paymentStatus: "Completed",
     }).sort({ _id: -1 });
-    res.status(200).json({ success: true, data: registrations });
+   return res.status(200).json({ success: true, data: registrations });
 
-    res.status(200).json({
-      success: true,
-      message: "Payment verified successfully",
-      data: registration,
-    });
   } catch (error) {
     console.error("Error in payment success:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
