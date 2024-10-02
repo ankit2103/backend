@@ -254,7 +254,7 @@ app.post('/payment-success', async (req, res) => {
 });
 app.get('/get-registrations', authenticateKey, async (req, res) => {
   try {
-      const registrations = await Registration.find({}).sort({_id:-1});
+      const registrations = await Registration.find({paymentStatus:"Completed"}).sort({_id:-1});
       res.status(200).json({ success: true, data: registrations });
   } catch (error) {
       console.error('Error fetching registrations:', error);
