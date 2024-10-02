@@ -173,7 +173,7 @@ app.post("/register", async (req, res) => {
     });
 
     await registration.save();
-    res
+   return res
       .status(201)
       .json({ success: true, orderId: order.id, amount: amount / 100 });
   } catch (error) {
@@ -253,7 +253,7 @@ app.post("/payment-success", async (req, res) => {
       }
     });
 
-    res.status(200).json({
+   return res.status(200).json({
       success: true,
       message: "Payment verified successfully",
       data: registration,
@@ -268,7 +268,7 @@ app.get("/get-registrations", authenticateKey, async (req, res) => {
     const registrations = await Registration.find({
       paymentStatus: "Completed",
     }).sort({ _id: -1 });
-    res.status(200).json({ success: true, data: registrations });
+    return res.status(200).json({ success: true, data: registrations });
   } catch (error) {
     console.error("Error fetching registrations:", error);
     res.status(500).json({ success: false, message: "Internal Server Error" });
