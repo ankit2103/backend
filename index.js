@@ -262,15 +262,6 @@ app.post("/payment-success", async (req, res) => {
         `UPPVL Team\n` +
         `Uttar Pradesh Pro Volleyball League`,
     };
-
-    transporter.sendMail(adminMailOptions, (error, info) => {
-      if (error) {
-        console.error("Error sending email to admin:", error);
-      } else {
-        console.log("Email sent to admin:", info.response);
-      }
-    });
-
     transporter.sendMail(userMailOptions, (error, info) => {
       if (error) {
         console.error("Error sending email to admin:", error);
