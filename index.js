@@ -94,7 +94,6 @@ app.post("/register", async (req, res) => {
       playerLastName,
       dob,
       phone,
-      previousSeasons,
       positionsPlayed,
       positionsTryingOut,
       parentFirstName,
@@ -154,7 +153,6 @@ app.post("/register", async (req, res) => {
       playerLastName,
       dob,
       phone,
-      previousSeasons,
       positionsPlayed,
       positionsTryingOut,
       parentFirstName,
@@ -224,7 +222,6 @@ app.post("/payment-success", async (req, res) => {
         `Player Name: ${registration.playerFirstName} ${registration.playerLastName}\n` +
         `Date of Birth: ${registration.dob}\n` +
         `Phone: ${registration.phone}\n` +
-        `Previous Seasons Played: ${registration.previousSeasons}\n` +
         `Positions Played: ${registration.positionsPlayed.join(", ")}\n` +
         `Positions Trying Out: ${registration.positionsTryingOut.join(
           ", "
